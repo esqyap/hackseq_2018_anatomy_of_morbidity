@@ -1,0 +1,74 @@
+---
+title: Exploratory analysis for life expectancy and other elements of the life table,
+  Canada, all provinces except Prince Edward Island dataset
+author: "Eva Y"
+date: '2018-10-12'
+output: 
+  html_document: 
+    keep_md: yes
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(fig.width=8, fig.height=8,
+                      echo=FALSE, warning=FALSE, message=FALSE)
+
+knitr::opts_knit$set(root.dir = "../")
+```
+
+```{r load dependency}
+library(data.table)
+library(ggplot2)
+```
+
+```{r load data}
+life_data <- fread("data/data_hackseq/13100114.csv", sep = ",")
+metadata <- fread("data/data_hackseq/13100114_MetaData.csv", sep = ",")
+```
+
+## Smell Test Data
+
+### What is the data that we have?
+
+```{r Smell test, echo=FALSE}
+names(life_data)
+dim(life_data)
+```
+
+There are 17 columns and here's what I think they are. 
+
+- REF_DATE: Between different years
+- GEO: Geographic location
+- DGUID: ?
+- Age group: Remove 'years' and replace the x in Element with years in age group. 
+- Sex: Simplify to F, M, or Both
+- Element: Remove spaces in between
+- UOM: ?
+- UOM_ID: ?
+- SCALAR_FACTOR: ?
+- SCALAR_ID: ?
+- VECTOR: ?
+- COORDINATE: ?
+- VALUE: Most important
+- STATUS: ?
+- SYMBOL: ?
+- TERMINATED: ?
+- DECIMALS: ?
+
+```{r Clean data}
+# change column names
+setnames(life_data, old = "Age group", new = "Age_group")
+
+# remove unimportant columns
+life_data[, c("DGUID", "UOM", "UOM_ID", "SCALAR_FACTOR", "SCALAR_ID", "VECTOR", "COORDINATE", "STATUS", "SYMBOL", "TERMINATED", "DECIMALS") := NULL]
+
+# clean values in each column
+life_data[, Age_group := gsub("[[:space:]].*", "", Age_group)]
+life_data[, Sex := gsub()]
+```
+
+```{r}
+life_data[GEO == "Canada", unique(Element)]
+```
+
