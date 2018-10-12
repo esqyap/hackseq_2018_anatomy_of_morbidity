@@ -65,10 +65,78 @@ life_data[, c("DGUID", "UOM", "UOM_ID", "SCALAR_FACTOR", "SCALAR_ID", "VECTOR", 
 
 # clean values in each column
 life_data[, Age_group := gsub("[[:space:]].*", "", Age_group)]
-life_data[, Sex := gsub()]
+life_data[, Sex := gsub("Males", "M", Sex)]
+life_data[, Sex := gsub("Females", "F", Sex)]
+life_data[, Sex := gsub("Both sexes", "Both", Sex)]
+
+# change Value to numeric
+life_data[, VALUE := as.numeric(VALUE)]
+
+# split REF_DATE column
+life_data[, c("START_YR", "END_YR") := tstrsplit(REF_DATE, "/", fixed = T)]
 ```
 
-```{r}
-life_data[GEO == "Canada", unique(Element)]
+### How does clean data looks like? 
+
+```{r View clean data}
+head(life_data)
+```
+
+## Create dataset with separate years
+
+```{r Create dataset with separate years, echo=FALSE}
+# for each REF_DATE, I would take the start year and end year and create a column of in between years, then merge. This will give me a list of tables, which I will merge at the end.
+
+create_sep_year <- function(ref_date, dt){
+
+  # create small table with the years
+  dt <- dt[REF_DATE == ref_date]
+  interval <- seq(dt[, unique(START_YR)], dt[, unique(END_YR)])
+  # dummy_dt <- data.table(YEAR = rep(interval, times = nrow(dt)))
+  
+  # create table with each row repeated for the number of years in one interval
+  dt <- dt[rep(1:.N, each = length(interval))]
+  big_dt <- cbind(interval, dt)
+}
+
+ref_date <- life_data[, unique(REF_DATE)]
+
+# testing code
+# test <- tail(life_data)
+# ref_date <- test[, unique(REF_DATE)]
+# test2 <- lapply(ref_date, create_sep_year, dt = test)
+# test2 <- rbindlist(test2)
+
+# run function
+life_data_sep <- lapply(ref_date, create_sep_year, dt = life_data)
+life_data_sep <- rbindlist(life_data_sep)
+
+# change column name
+setnames(life_data_sep, old = "interval", new = "YEAR")
+```
+
+```{r Check out data}
+head(life_data_sep)
+```
+
+> How many rows and columns are there? 
+
+```{r Dimensions for clean data}
+dim(life_data_sep)
+```
+
+Number of rows is `r nrow(life_data_sep)` and number of columns is `r ncol(life_data_sep)`. This seems correct since the original data has `r nrow(life_data)` and each interval covers three years. 
+
+## Average duplicated years
+
+To separate the data based on individual years, we created duplicates for years that are within the overlapping year intervals. Now, the task is to get an average for these duplicates. 
+
+```{r average the years based on year}
+life_data_sep_avg <- life_data_sep[, .(AVG_VALUE = mean(VALUE)), by = c("YEAR", "GEO", "Age_group", "Sex", "Element")][order(YEAR)]
+head(life_data_sep_avg)
+```
+
+```{r Save csv, eval=FALSE}
+write.table(life_data_sep_avg, "results/life_data_sep_avg.csv", sep = ",")
 ```
 
