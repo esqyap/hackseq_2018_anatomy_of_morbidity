@@ -16,7 +16,7 @@ editor_options:
 
 
 ```
-## Read 75.3% of 1048950 rowsRead 1048950 rows and 17 (of 17) columns from 0.180 GB file in 00:00:03
+## Read 81.0% of 1048950 rowsRead 1048950 rows and 17 (of 17) columns from 0.180 GB file in 00:00:03
 ```
 
 ## Smell Test Data
@@ -118,7 +118,7 @@ Number of rows is 3146850 and number of columns is 9. This seems correct since t
 
 ## Average duplicated years
 
-To separate the data based on individual years, we created duplicates for years that are within the overlapping year intervals. Now, the task is to get an average for these duplicates. 
+To separate the data based on individual years, we created duplicates for years that are within the overlapping year intervals. Now, the task is to get an average for these duplicates. Let's check out how this data looks.
 
 
 ```
@@ -140,3 +140,4 @@ To separate the data based on individual years, we created duplicates for years 
 
 
 
+## Done 

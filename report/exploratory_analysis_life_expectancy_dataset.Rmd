@@ -129,7 +129,7 @@ Number of rows is `r nrow(life_data_sep)` and number of columns is `r ncol(life_
 
 ## Average duplicated years
 
-To separate the data based on individual years, we created duplicates for years that are within the overlapping year intervals. Now, the task is to get an average for these duplicates. 
+To separate the data based on individual years, we created duplicates for years that are within the overlapping year intervals. Now, the task is to get an average for these duplicates. Let's check out how this data looks.
 
 ```{r average the years based on year}
 life_data_sep_avg <- life_data_sep[, .(AVG_VALUE = mean(VALUE)), by = c("YEAR", "GEO", "Age_group", "Sex", "Element")][order(YEAR)]
@@ -137,6 +137,7 @@ head(life_data_sep_avg)
 ```
 
 ```{r Save csv, eval=FALSE}
-write.table(life_data_sep_avg, "results/life_data_sep_avg.csv", sep = ",")
+write.table(life_data_sep_avg, "results/life_data_sep_avg.csv", sep = ",", row.names = F)
 ```
 
+## Done 
